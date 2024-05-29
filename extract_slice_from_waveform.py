@@ -62,27 +62,48 @@ def main(txt_filename, start, end):
     pd.options.mode.chained_assignment = None
     df_sub["time"] = df_temp.copy(deep=True)
 
+    # 将开头的电压都设置为-5mV，如果不需要该功能，注释掉这段即可。
+    low_value1 = -5e-3
+    for i in range(15):
+        df_sub["vout"].iloc[i] = low_value1
+
     # 保存到文件
     output_filename = filename + ".csv"
     df_sub.to_csv(output_filename, index=False, header=False)
 
     os.remove("temp1.txt")
 
-    print("\nDone.\n\n")
+    print("\nDone.\n")
     print("The .csv file has been generated.\n")
 
 
-arg1 = sys.argv[1]
+def run_mode():
+    arg_num = len(sys.argv)
+    arg1 = sys.argv[1]
+    print("\nThere are " + str(arg_num) + " parameters.")
 
-if arg1 == "-h":
-    show_help_info()
-else:
-    filename = arg1
-    start = float(sys.argv[2])
-    end = float(sys.argv[3])
-    # print("par: ", filename, start, end)
-    main(filename, start, end)
+    if arg1 == "-h":
+        show_help_info()
+    elif arg_num == 2:
+        filename = arg1
+        start = 80e-9
+        end = 90e-9
+        main(filename, start, end)
+    elif arg_num == 4:
+        filename = arg1
+        start = float(sys.argv[2])
+        end = float(sys.argv[3])
+        # print("par: ", filename, start, end)
+        main(filename, start, end)
+    else:
+        print("There are errors in the parameters.")
+        sys.exit(1)
 
 
-# debug用
-# main("./inputlink_12Gbps_prbs.txt", 80e-9, 90e-9)
+def debug_mode():
+    # debug用
+    main("./inputlink_12Gbps_prbs.txt", 80e-9, 90e-9)
+
+
+run_mode()
+# debug_mode()
